@@ -1,5 +1,5 @@
 use byteorder::{BigEndian, ByteOrder};
-use std::num::{NonZeroI16, NonZeroI32, NonZeroI64};
+use std::num::{NonZeroI16, NonZeroI32, NonZeroI64, NonZeroU16, NonZeroU32, NonZeroU64};
 
 use crate::decode::Decode;
 use crate::encode::{Encode, IsNull};
@@ -172,5 +172,29 @@ impl PgHasArrayType for NonZeroI32 {
 impl PgHasArrayType for NonZeroI64 {
     fn array_type_info() -> PgTypeInfo {
         PgTypeInfo::INT8_ARRAY
+    }
+}
+
+impl Decode<'_, Postgres> for NonZeroU16 {
+    fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
+        let value: u16 = int_decode(value)?.try_into()?;
+
+        NonZeroU16::try_from(value).map_err(Into::into)
+    }
+}
+
+impl Decode<'_, Postgres> for NonZeroU32 {
+    fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
+        let value: u32 = int_decode(value)?.try_into()?;
+
+        NonZeroU32::try_from(value).map_err(Into::into)
+    }
+}
+
+impl Decode<'_, Postgres> for NonZeroU64 {
+    fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
+        let value: u64 = int_decode(value)?.try_into()?;
+
+        NonZeroU64::try_from(value).map_err(Into::into)
     }
 }
